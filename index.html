@@ -164,3 +164,26 @@
     </div>
 </body>
 </html>
+
+<script>
+async function updateLiveData() {
+    try {
+        const response = await fetch('/.netlify/functions/ransomware-api');
+        const data = await response.json();
+        
+        // Update LIVE badges
+        const badges = document.querySelectorAll('.data-source-badge');
+        badges.forEach((badge, i) => {
+            const sources = ['ransomwhere', 'cisa', 'canadian'];
+            const source = data.sources[sources[i]];
+            if (source?.status === 'success') {
+                badge.textContent = 'LIVE';
+                badge.style.background = '#4CAF50';
+            }
+        });
+    } catch (e) {
+        console.log('API error:', e);
+    }
+}
+updateLiveData();
+</script>
