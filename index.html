@@ -5,92 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Ransomware Intelligence Center</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: system-ui, sans-serif; 
-            background: #000; 
-            color: #fff; 
-            font-size: 13px; 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
         }
-        .container { max-width: 1800px; margin: 0 auto; padding: 16px; }
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 20px 0; 
-            border-bottom: 1px solid #1e40af; 
-            margin-bottom: 20px; 
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .title { font-size: 24px; font-weight: 600; color: #fff; margin: 0 0 6px 0; }
-        .subtitle { font-size: 13px; color: #9ca3af; }
-        .viral-stats { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 16px; 
-            margin-bottom: 20px; 
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        .viral-card { 
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); 
-            border: 1px solid #dc2626; 
-            border-radius: 8px; 
-            padding: 20px; 
-            text-align: center; 
-            animation: pulse 3s infinite; 
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            opacity: 0.9;
         }
-        @keyframes pulse { 
-            0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.4); } 
-            50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); } 
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+        .status.live {
+            background: #4CAF50;
+            color: white;
+        }
+        .status.error {
+            background: #f44336;
+            color: white;
+        }
+        .status.loading {
+            background: #FF9800;
+            color: white;
+        }
+        .count {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1 class="title">Global Ransomware Intelligence Center</h1>
-            <p class="subtitle">Real-time threat monitoring with serverless backend</p>
+        <h1>🛡️ Global Ransomware Intelligence Center</h1>
+        <p class="subtitle">Real-time threat monitoring and distributed intelligence</p>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>
+                    💰 Bitcoin Ransomware Payments
+                    <span class="status loading" id="ransomwhere-status">LOADING</span>
+                </h3>
+                <div class="count" id="ransomwhere-count">Loading...</div>
+                <p>Active payment tracking from Ransomwhe.re</p>
+            </div>
+            
+            <div class="card">
+                <h3>
+                    🚨 CISA Security Alerts
+                    <span class="status loading" id="cisa-status">LOADING</span>
+                </h3>
+                <div class="count" id="cisa-count">Loading...</div>
+                <p>Latest cybersecurity advisories from US-CERT</p>
+            </div>
+            
+            <div class="card">
+                <h3>
+                    🇨🇦 Canadian Cyber Centre
+                    <span class="status loading" id="canadian-status">LOADING</span>
+                </h3>
+                <div class="count" id="canadian-count">Loading...</div>
+                <p>Security guidance from Canadian government</p>
+            </div>
         </div>
         
-        <div class="viral-stats">
-            <div class="viral-card">
-                <div style="font-size: 32px; font-weight: 700; color: #fff;">Loading...</div>
-                <div style="font-size: 12px; color: #fecaca;">Total BTC Payments</div>
-            </div>
-            <div class="viral-card">
-                <div style="font-size: 32px; font-weight: 700; color: #fff;">Loading...</div>
-                <div style="font-size: 12px; color: #fecaca;">CISA Alerts</div>
-            </div>
+        <div class="footer">
+            <p>🏗️ Built with resilient, distributed architecture</p>
+            <p>Powered by Konvergence | Demonstrates operational continuity under adverse conditions</p>
+            <p id="last-update">Last updated: Loading...</p>
         </div>
-        
-        <p style="color: #10b981; padding: 20px; text-align: center;">
-            🚀 Serverless backend working! Real API data loading...
-        </p>
-        
-        <script>
-            console.log('✅ Simple serverless dashboard loaded');
-            
-            async function fetchData() {
-                try {
-                    console.log('🔍 Fetching from serverless API...');
-                    const response = await fetch('/.netlify/functions/ransomware-api');
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('✅ API data received:', data);
-                        document.querySelector('p').innerHTML = 
-                            '🎉 SUCCESS! Serverless backend is working and fetching real API data!';
-                    } else {
-                        throw new Error('API failed');
-                    }
-                } catch (error) {
-                    console.log('❌ API Error:', error);
-                    document.querySelector('p').innerHTML = 
-                        '⚠️ Serverless function deployed but APIs may be down - this is normal!';
-                }
-            }
-            
-            // Test the API
-            fetchData();
-        </script>
     </div>
+
+    <script>
+        async function loadData() {
+            try {
+                console.log('🔍 Fetching from serverless API...');
+                const response = await fetch('/.netlify/functions/ransomware-api');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ API data received:', data);
+                
+                // Update timestamp
+                document.getElementById('last-update').textContent = 
+                    `Last updated: ${new Date(data.timestamp).toLocaleString()}`;
+                
+                // Update each API source
+                updateSource('ransomwhere', data.sources.ransomwhere);
+                updateSource('cisa', data.sources.cisa);
+                updateSource('canadian', data.sources.canadian);
+                
+            } catch (error) {
+                console.error('❌ API Error:', error);
+                document.getElementById('last-update').textContent = 
+                    `Error: ${error.message}`;
+            }
+        }
+        
+        function updateSource(sourceName, sourceData) {
+            const statusElement = document.getElementById(`${sourceName}-status`);
+            const countElement = document.getElementById(`${sourceName}-count`);
+            
+            if (sourceData.status === 'success') {
+                statusElement.textContent = 'LIVE';
+                statusElement.className = 'status live';
+                
+                if (sourceData.data && sourceData.data.count !== undefined) {
+                    countElement.textContent = sourceData.data.count;
+                } else {
+                    countElement.textContent = 'Connected';
+                }
+            } else {
+                statusElement.textContent = 'ERROR';
+                statusElement.className = 'status error';
+                countElement.textContent = 'Unavailable';
+            }
+        }
+        
+        // Load data when page loads
+        loadData();
+        
+        // Refresh every 5 minutes
+        setInterval(loadData, 300000);
+    </script>
 </body>
 </html>
