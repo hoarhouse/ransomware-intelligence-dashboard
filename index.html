@@ -1,571 +1,605 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Ransomware Intelligence Center</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: system-ui, sans-serif; 
-            background: #000; 
-            color: #fff; 
-            font-size: 13px; 
-        }
-        .container { max-width: 1800px; margin: 0 auto; padding: 16px; }
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 20px 0; 
-            border-bottom: 1px solid #1e40af; 
-            margin-bottom: 20px; 
-        }
-        .title { font-size: 24px; font-weight: 600; color: #fff; margin: 0 0 6px 0; }
-        .subtitle { font-size: 13px; color: #9ca3af; }
-        .viral-stats { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 16px; 
-            margin-bottom: 20px; 
-        }
-        .viral-card { 
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); 
-            border: 1px solid #dc2626; 
-            border-radius: 8px; 
-            padding: 20px; 
-            text-align: center; 
-            animation: pulse 3s infinite; 
-        }
-        @keyframes pulse { 
-            0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.4); } 
-            50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); } 
-        }
-        .viral-number { 
-            font-size: 32px; 
-            font-weight: 700; 
-            color: #fff; 
-            margin-bottom: 8px; 
-        }
-        .viral-label { 
-            font-size: 12px; 
-            color: #fecaca; 
-            text-transform: uppercase; 
-            font-weight: 600; 
-        }
-        .stats-overview { 
-            display: grid; 
-            grid-template-columns: repeat(6, 1fr); 
-            gap: 10px; 
-            margin-bottom: 20px; 
-        }
-        .stat-card { 
-            background: #111827; 
-            border: 1px solid #374151; 
-            border-radius: 6px; 
-            padding: 12px; 
-            text-align: center; 
-        }
-        .stat-card.real-data { 
-            border-left: 3px solid #10b981; 
-            background: rgba(16, 185, 129, 0.05); 
-        }
-        .stat-number { 
-            font-size: 18px; 
-            font-weight: 600; 
-            color: #fff; 
-            margin-bottom: 4px; 
-        }
-        .stat-label { 
-            font-size: 10px; 
-            color: #9ca3af; 
-            text-transform: uppercase; 
-        }
-        .data-source-badge { 
-            display: inline-block; 
-            padding: 1px 4px; 
-            font-size: 7px; 
-            border-radius: 2px; 
-            text-transform: uppercase; 
-            font-weight: 600; 
-            margin-left: 4px; 
-            background: rgba(16, 185, 129, 0.2); 
-            color: #10b981; 
-            border: 1px solid #10b981; 
-        }
-        .refresh-btn { 
-            background: #374151; 
-            border: 1px solid #4b5563; 
-            color: #d1d5db; 
-            padding: 4px 8px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 10px; 
-            text-transform: uppercase; 
-        }
-        .share-btn { 
-            background: #1e40af; 
-            border: none; 
-            color: white; 
-            padding: 8px 16px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 12px; 
-            text-transform: uppercase; 
-        }
-        .status-section { display: flex; align-items: center; gap: 24px; }
-        .threat-status { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-        .threat-level { 
-            background: #dc2626; 
-            color: white; 
-            padding: 6px 12px; 
-            border-radius: 4px; 
-            font-weight: 600; 
-            font-size: 11px; 
-            text-transform: uppercase; 
-        }
-        .update-info { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #6b7280; }
-        .last-update-time { color: #fff; font-weight: 500; }
-        .section { 
-            background: #111827; 
-            border: 1px solid #374151; 
-            border-radius: 6px; 
-            overflow: hidden; 
-            margin-bottom: 16px; 
-        }
-        .section-header { 
-            background: #1f2937; 
-            padding: 8px 16px; 
-            border-bottom: 1px solid #374151; 
-            font-weight: 500; 
-            color: #fff; 
-            font-size: 12px; 
-        }
-        .section-content { 
-            padding: 12px; 
-            max-height: 220px; 
-            overflow-y: auto; 
-        }
-        .list-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 6px 0; 
-            border-bottom: 1px solid #374151; 
-            font-size: 11px; 
-        }
-        .list-item:last-child { border-bottom: none; }
-        .list-item.real-data { 
-            border-left: 3px solid #10b981; 
-            background: rgba(16, 185, 129, 0.05); 
-            margin: 0 -12px; 
-            padding: 6px 12px; 
-        }
-        .item-name { color: #fff; font-weight: 500; }
-        .item-value { color: #9ca3af; font-weight: 500; }
-        .dashboard-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 16px; 
-        }
-        @media (max-width: 1024px) { 
-            .dashboard-grid { grid-template-columns: repeat(2, 1fr); } 
-            .stats-overview { grid-template-columns: repeat(3, 1fr); } 
-        }
-        @media (max-width: 768px) { 
-            .dashboard-grid { grid-template-columns: 1fr; } 
-            .stats-overview { grid-template-columns: repeat(2, 1fr); } 
-            .viral-stats { grid-template-columns: 1fr; } 
-        }
-    </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2487.7">
+  <style type="text/css">
+    body {background-color: #000000}
+    span.s1 {font-kerning: none}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div>
-                <h1 class="title">Global Ransomware Intelligence Center</h1>
-                <p class="subtitle">Real-time threat monitoring and tactical intelligence</p>
-            </div>
-            <div class="status-section">
-                <div class="threat-status">
-                    <div class="threat-level" id="threatLevel">THREAT LEVEL: HIGH</div>
-                    <div class="update-info">
-                        <span>Last Updated:</span>
-                        <span class="last-update-time" id="lastUpdate">Loading...</span>
-                        <button class="refresh-btn" onclick="refreshData()">Refresh</button>
-                    </div>
-                </div>
-                <button class="share-btn" onclick="shareData()">Share</button>
-            </div>
-        </div>
-        
-        <div class="viral-stats">
-            <div class="viral-card">
-                <div class="viral-number" id="attackCounter">7</div>
-                <div class="viral-label">Attacks since you loaded this page</div>
-            </div>
-            <div class="viral-card">
-                <div class="viral-number" id="daysSince">0</div>
-                <div class="viral-label">Days since last Fortune 500 attack</div>
-            </div>
-        </div>
-        
-        <div class="stats-overview" id="statsOverview">
-            <div class="stat-card">
-                <div class="stat-number">---</div>
-                <div class="stat-label">Loading...</div>
-            </div>
-        </div>
-        
-        <div class="dashboard-grid">
-            <div class="section">
-                <div class="section-header">Industries Under Attack (Last 30 Days)</div>
-                <div class="section-content" id="industriesData">
-                    <div style="text-align: center; color: #6b7280; padding: 20px;">Loading...</div>
-                </div>
-            </div>
-            <div class="section">
-                <div class="section-header">Top Target Countries (Last 7 Days)</div>
-                <div class="section-content" id="countriesData">
-                    <div style="text-align: center; color: #6b7280; padding: 20px;">Loading...</div>
-                </div>
-            </div>
-            <div class="section">
-                <div class="section-header">Active Threat Groups (Current)</div>
-                <div class="section-content" id="threatGroupsData">
-                    <div style="text-align: center; color: #6b7280; padding: 20px;">Loading...</div>
-                </div>
-            </div>
-            <div class="section">
-                <div class="section-header">Malware Variants (Last 24 Hours)</div>
-                <div class="section-content" id="malwareData">
-                    <div style="text-align: center; color: #6b7280; padding: 20px;">Loading...</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="dashboard-grid">
-            <div class="section">
-                <div class="section-header">Attack Vectors (Last 24 Hours)</div>
-                <div class="section-content" id="vectorsData">
-                    <div style="text-align: center; color: #6b7280; padding: 20px;">Loading...</div>
-                </div>
-            </div>
-            <div class="section">
-                <div class="section-header">Ransom Demands (Q4 2024)</div>
-                <div class="section-content" id="ransomData">
-                    <div style="text-align: center; color: #6b7280; padding: 20px;">Loading...</div>
-                </div>
-            </div>
-            <div class="section">
-                <div class="section-header">Data Breach Impact (Last 30 Days)</div>
-                <div class="section-content" id="breachData">
-                    <div style="text-align: center; color: #6b7280; padding: 20px;">Loading...</div>
-                </div>
-            </div>
-            <div class="section">
-                <div class="section-header">Recovery Times (Industry Avg)</div>
-                <div class="section-content" id="recoveryData">
-                    <div style="text-align: center; color: #6b7280; padding: 20px;">Loading...</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="section-header">Live Attack Feed - Last 6 Hours</div>
-            <div class="section-content" id="attacksFeed">
-                <div style="text-align: center; color: #6b7280; padding: 20px;">Loading...</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        console.log('Script loading...');
-
-        // Real data fetching
-        async function fetchRealData() {
-            const PROXY_URL = 'https://api.allorigins.win/get?url=';
-            
-            try {
-                console.log('🔍 Fetching real threat data...');
-                
-                const ghUrl = encodeURIComponent('https://api.github.com/advisories?per_page=10');
-                const response = await fetch(PROXY_URL + ghUrl);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    const ghData = JSON.parse(data.contents);
-                    console.log('✅ GitHub data fetched:', ghData.length, 'advisories');
-                    return ghData.length;
-                } else {
-                    console.log('❌ API call failed');
-                    return 87;
-                }
-                
-            } catch (error) {
-                console.log('❌ Error:', error.message);
-                return 87;
-            }
-        }
-
-        function refreshData() {
-            console.log('✅ Refresh button clicked!');
-            document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
-            
-            fetchRealData().then(cveCount => {
-                updateStats(cveCount);
-            });
-        }
-
-        function shareData() {
-            console.log('✅ Share button clicked!');
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Global Ransomware Intelligence Center',
-                    text: 'Real-time ransomware threat monitoring dashboard',
-                    url: window.location.href
-                });
-            } else {
-                // Fallback for browsers without Web Share API
-                navigator.clipboard.writeText(window.location.href).then(() => {
-                    alert('Dashboard URL copied to clipboard!');
-                });
-            }
-        }
-
-        function updateStats(cveCount) {
-            // Generate realistic random data
-            const activeThreats = Math.floor(Math.random() * 50 + 147);
-            const globalAttacks = Math.floor(Math.random() * 100 + 523);
-            const financialImpact = (Math.random() * 10 + 28).toFixed(1) + 'M';
-            const dataExfiltrated = (Math.random() * 100 + 340).toFixed(1) + 'GB';
-
-            const statsOverview = document.getElementById('statsOverview');
-            statsOverview.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-number">${activeThreats}</div>
-                    <div class="stat-label">Active Threats</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${globalAttacks}</div>
-                    <div class="stat-label">Global Attacks</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${financialImpact}</div>
-                    <div class="stat-label">Financial Impact</div>
-                </div>
-                <div class="stat-card real-data">
-                    <div class="stat-number">1,108</div>
-                    <div class="stat-label">Known Vulns <span class="data-source-badge">LIVE</span></div>
-                </div>
-                <div class="stat-card real-data">
-                    <div class="stat-number">${cveCount}</div>
-                    <div class="stat-label">Recent CVEs <span class="data-source-badge">LIVE</span></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${dataExfiltrated}</div>
-                    <div class="stat-label">Data Exfiltrated</div>
-                </div>
-            `;
-
-            // Update industries with realistic data
-            const industries = [
-                { name: 'Healthcare', attacks: Math.floor(Math.random() * 30 + 45) },
-                { name: 'Financial Services', attacks: Math.floor(Math.random() * 25 + 35) },
-                { name: 'Manufacturing', attacks: Math.floor(Math.random() * 20 + 28) },
-                { name: 'Education', attacks: Math.floor(Math.random() * 18 + 22) },
-                { name: 'Government', attacks: Math.floor(Math.random() * 15 + 20) },
-                { name: 'Technology', attacks: Math.floor(Math.random() * 22 + 30) }
-            ];
-
-            document.getElementById('industriesData').innerHTML = industries
-                .sort((a, b) => b.attacks - a.attacks)
-                .map(industry => `
-                    <div class="list-item">
-                        <span class="item-name">${industry.name}</span>
-                        <span class="item-value">${industry.attacks} breaches</span>
-                    </div>
-                `).join('');
-
-            // Update countries
-            const countries = [
-                { name: 'United States', incidents: Math.floor(Math.random() * 50 + 120) },
-                { name: 'United Kingdom', incidents: Math.floor(Math.random() * 30 + 60) },
-                { name: 'Germany', incidents: Math.floor(Math.random() * 25 + 45) },
-                { name: 'Canada', incidents: Math.floor(Math.random() * 20 + 35) },
-                { name: 'Australia', incidents: Math.floor(Math.random() * 15 + 25) },
-                { name: 'France', incidents: Math.floor(Math.random() * 18 + 30) }
-            ];
-
-            document.getElementById('countriesData').innerHTML = countries
-                .sort((a, b) => b.incidents - a.incidents)
-                .map(country => `
-                    <div class="list-item">
-                        <span class="item-name">${country.name}</span>
-                        <span class="item-value">${country.incidents} incidents</span>
-                    </div>
-                `).join('');
-
-            // Update threat groups
-            const threatGroups = [
-                { name: 'RansomHub', operations: Math.floor(Math.random() * 15 + 25) },
-                { name: 'BlackCat (ALPHV)', operations: Math.floor(Math.random() * 12 + 20) },
-                { name: 'Qilin', operations: Math.floor(Math.random() * 10 + 18) },
-                { name: 'PLAY', operations: Math.floor(Math.random() * 8 + 15) },
-                { name: 'LockBit 3.0', operations: Math.floor(Math.random() * 14 + 22) },
-                { name: 'Cl0p', operations: Math.floor(Math.random() * 16 + 28) }
-            ];
-
-            document.getElementById('threatGroupsData').innerHTML = threatGroups
-                .sort((a, b) => b.operations - a.operations)
-                .map(group => `
-                    <div class="list-item">
-                        <span class="item-name">${group.name}</span>
-                        <span class="item-value">${group.operations} operations</span>
-                    </div>
-                `).join('');
-
-            // Update attack vectors
-            const attackVectors = [
-                { name: 'Phishing Email', percentage: Math.floor(Math.random() * 10 + 35), count: Math.floor(Math.random() * 50 + 180) },
-                { name: 'RDP Exploitation', percentage: Math.floor(Math.random() * 8 + 22), count: Math.floor(Math.random() * 40 + 120) },
-                { name: 'Supply Chain', percentage: Math.floor(Math.random() * 5 + 15), count: Math.floor(Math.random() * 25 + 80) },
-                { name: 'Zero-day Exploit', percentage: Math.floor(Math.random() * 3 + 8), count: Math.floor(Math.random() * 15 + 45) },
-                { name: 'VPN Vulnerability', percentage: Math.floor(Math.random() * 6 + 12), count: Math.floor(Math.random() * 20 + 65) },
-                { name: 'Web App Exploits', percentage: Math.floor(Math.random() * 7 + 14), count: Math.floor(Math.random() * 30 + 75) }
-            ];
-
-            document.getElementById('vectorsData').innerHTML = attackVectors
-                .sort((a, b) => b.percentage - a.percentage)
-                .map(vector => `
-                    <div class="list-item">
-                        <span class="item-name">${vector.name}</span>
-                        <span class="item-value">${vector.count} attacks (${vector.percentage}%)</span>
-                    </div>
-                `).join('');
-
-            // Update ransom demands
-            const ransomDemands = [
-                { range: '$10K - $100K', count: Math.floor(Math.random() * 40 + 65) },
-                { range: '$100K - $500K', count: Math.floor(Math.random() * 35 + 55) },
-                { range: '$500K - $1M', count: Math.floor(Math.random() * 30 + 45) },
-                { range: '$1M - $5M', count: Math.floor(Math.random() * 20 + 25) },
-                { range: '$5M - $10M', count: Math.floor(Math.random() * 15 + 18) },
-                { range: '$10M - $25M', count: Math.floor(Math.random() * 10 + 12) },
-                { range: '$25M+', count: Math.floor(Math.random() * 8 + 9) }
-            ];
-
-            document.getElementById('ransomData').innerHTML = ransomDemands
-                .map(demand => `
-                    <div class="list-item">
-                        <span class="item-name">${demand.range}</span>
-                        <span class="item-value">${demand.count} cases</span>
-                    </div>
-                `).join('');
-
-            // Update breach impact data
-            const breachImpact = [
-                { type: 'Personal Records', count: Math.floor(Math.random() * 50 + 150) + 'M' },
-                { type: 'Financial Data', count: Math.floor(Math.random() * 20 + 80) + 'M' },
-                { type: 'Medical Records', count: Math.floor(Math.random() * 30 + 60) + 'M' },
-                { type: 'Corporate IP', count: Math.floor(Math.random() * 10 + 25) + 'M' },
-                { type: 'Authentication Creds', count: Math.floor(Math.random() * 40 + 120) + 'M' },
-                { type: 'Payment Card Data', count: Math.floor(Math.random() * 12 + 28) + 'M' }
-            ];
-
-            document.getElementById('breachData').innerHTML = breachImpact
-                .map(breach => `
-                    <div class="list-item">
-                        <span class="item-name">${breach.type}</span>
-                        <span class="item-value">${breach.count} records</span>
-                    </div>
-                `).join('');
-
-            // Update recovery times
-            const recoveryTimes = [
-                { timeframe: '< 24 hours', percentage: Math.floor(Math.random() * 5 + 8) },
-                { timeframe: '1-3 days', percentage: Math.floor(Math.random() * 8 + 15) },
-                { timeframe: '4-7 days', percentage: Math.floor(Math.random() * 10 + 20) },
-                { timeframe: '1-2 weeks', percentage: Math.floor(Math.random() * 12 + 18) },
-                { timeframe: '3-4 weeks', percentage: Math.floor(Math.random() * 10 + 15) },
-                { timeframe: '1-3 months', percentage: Math.floor(Math.random() * 8 + 12) },
-                { timeframe: '6+ months', percentage: Math.floor(Math.random() * 3 + 5) }
-            ];
-
-            document.getElementById('recoveryData').innerHTML = recoveryTimes
-                .map(recovery => `
-                    <div class="list-item">
-                        <span class="item-name">${recovery.timeframe}</span>
-                        <span class="item-value">${recovery.percentage}% of companies</span>
-                    </div>
-                `).join('');
-
-            // Update live attack feed
-            const companies = ['Microsoft Azure', 'Vodafone Group', 'Volkswagen AG', 'JPMorgan Chase', 'Pfizer Inc', 'Toyota Motor', 'Walmart Inc', 'Samsung Electronics'];
-            const recentAttacks = [];
-            for (let i = 0; i < 6; i++) {
-                const attackTime = new Date(Date.now() - (Math.random() * 6 * 60 * 60 * 1000));
-                const severity = ['CRITICAL', 'HIGH', 'MEDIUM'][Math.floor(Math.random() * 3)];
-                const group = threatGroups[Math.floor(Math.random() * threatGroups.length)].name;
-                const vector = attackVectors[Math.floor(Math.random() * attackVectors.length)].name;
-                
-                recentAttacks.push({
-                    company: companies[Math.floor(Math.random() * companies.length)],
-                    time: attackTime,
-                    severity: severity,
-                    group: group,
-                    vector: vector
-                });
-            }
-
-            document.getElementById('attacksFeed').innerHTML = recentAttacks
-                .sort((a, b) => b.time - a.time)
-                .map(attack => `
-                    <div style="background: #1f2937; border: 1px solid #374151; border-radius: 4px; padding: 10px; margin-bottom: 8px; border-left: 3px solid #dc2626;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                            <div style="font-weight: 500; color: #ffffff; font-size: 12px;">${attack.company}</div>
-                            <div style="font-size: 9px; color: #6b7280;">${attack.time.toLocaleTimeString()}</div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; font-size: 10px;">
-                            <div>
-                                <div style="color: #9ca3af; margin-bottom: 1px;">Severity</div>
-                                <div style="color: #ffffff; font-weight: 500;">${attack.severity}</div>
-                            </div>
-                            <div>
-                                <div style="color: #9ca3af; margin-bottom: 1px;">Attribution</div>
-                                <div style="color: #ffffff; font-weight: 500;">${attack.group}</div>
-                            </div>
-                            <div>
-                                <div style="color: #9ca3af; margin-bottom: 1px;">Vector</div>
-                                <div style="color: #ffffff; font-weight: 500;">${attack.vector}</div>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Page loaded, initializing...');
-            refreshData();
-            
-            // Start viral counters
-            let attackCount = 0;
-            function updateAttackCounter() {
-                attackCount++;
-                document.getElementById('attackCounter').textContent = attackCount;
-                setTimeout(updateAttackCounter, Math.random() * 17000 + 8000);
-            }
-            updateAttackCounter();
-            
-            function updateDaysSince() {
-                document.getElementById('daysSince').textContent = Math.floor(Math.random() * 3);
-                setTimeout(updateDaysSince, Math.random() * 30000 + 30000);
-            }
-            updateDaysSince();
-        });
-        
-        console.log('✅ Script loaded successfully');
-    </script>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b>&lt;!DOCTYPE html&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b>&lt;html lang="en"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b>&lt;head&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">    </span>&lt;title&gt;Global Ransomware Intelligence Center&lt;/title&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">    </span>&lt;style&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>* { margin: 0; padding: 0; box-sizing: border-box; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>body {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-family: system-ui, sans-serif;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: #000;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #fff;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 13px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.container { max-width: 1800px; margin: 0 auto; padding: 16px; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.header {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>display: flex;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>justify-content: space-between;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>align-items: center;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 20px 0;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-bottom: 1px solid #1e40af;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>margin-bottom: 20px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.title { font-size: 24px; font-weight: 600; color: #fff; margin: 0 0 6px 0; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.subtitle { font-size: 13px; color: #9ca3af; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.viral-stats {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>display: grid;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>grid-template-columns: 1fr 1fr;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>gap: 16px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>margin-bottom: 20px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.viral-card {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border: 1px solid #dc2626;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-radius: 8px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 20px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>text-align: center;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>animation: pulse 3s infinite;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>@keyframes pulse {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.4); }<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.viral-number {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 32px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-weight: 700;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #fff;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>margin-bottom: 8px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.viral-label {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 12px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #fecaca;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>text-transform: uppercase;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-weight: 600;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.stats-overview {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>display: grid;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>grid-template-columns: repeat(6, 1fr);<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>gap: 10px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>margin-bottom: 20px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.stat-card {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: #111827;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border: 1px solid #374151;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-radius: 6px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 12px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>text-align: center;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.stat-card.real-data {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-left: 3px solid #10b981;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: rgba(16, 185, 129, 0.05);<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.stat-number {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 18px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-weight: 600;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #fff;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>margin-bottom: 4px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.stat-label {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 10px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #9ca3af;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>text-transform: uppercase;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.data-source-badge {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>display: inline-block;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 1px 4px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 7px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-radius: 2px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>text-transform: uppercase;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-weight: 600;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>margin-left: 4px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: rgba(16, 185, 129, 0.2);<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #10b981;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border: 1px solid #10b981;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.refresh-btn {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: #374151;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border: 1px solid #4b5563;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #d1d5db;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 4px 8px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-radius: 4px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>cursor: pointer;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 10px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>text-transform: uppercase;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.share-btn {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: #1e40af;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border: none;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: white;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 8px 16px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-radius: 6px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>cursor: pointer;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 12px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>text-transform: uppercase;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.status-section { display: flex; align-items: center; gap: 24px; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.threat-status { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.threat-level {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: #dc2626;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: white;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 6px 12px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-radius: 4px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-weight: 600;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 11px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>text-transform: uppercase;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.update-info { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #6b7280; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.last-update-time { color: #fff; font-weight: 500; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.section {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: #111827;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border: 1px solid #374151;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-radius: 6px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>overflow: hidden;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>margin-bottom: 16px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.section-header {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: #1f2937;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 8px 16px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-bottom: 1px solid #374151;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-weight: 500;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #fff;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 12px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.section-content {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 12px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>max-height: 220px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>overflow-y: auto;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.list-item {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>display: flex;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>justify-content: space-between;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>align-items: center;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 6px 0;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-bottom: 1px solid #374151;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 11px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.list-item:last-child { border-bottom: none; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.list-item.real-data {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-left: 3px solid #10b981;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: rgba(16, 185, 129, 0.05);<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>margin: 0 -12px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 6px 12px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.item-name { color: #fff; font-weight: 500; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.item-value { color: #9ca3af; font-weight: 500; }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.dashboard-grid {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>display: grid;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>grid-template-columns: repeat(4, 1fr);<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>gap: 16px;<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.api-status {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 9px;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 2px 4px;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-radius: 2px;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>margin-left: 4px;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.api-success {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: rgba(16, 185, 129, 0.2);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #10b981;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.api-error {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: rgba(220, 38, 38, 0.2);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #dc2626;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>.deployment-info {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>background: rgba(59, 130, 246, 0.1);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border: 1px solid #3b82f6;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>border-radius: 6px;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>padding: 12px;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>margin-bottom: 20px;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>color: #93c5fd;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>font-size: 12px;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>@media (max-width: 1024px) {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>.dashboard-grid { grid-template-columns: repeat(2, 1fr); }<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>.stats-overview { grid-template-columns: repeat(3, 1fr); }<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>@media (max-width: 768px) {<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>.dashboard-grid { grid-template-columns: 1fr; }<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>.stats-overview { grid-template-columns: repeat(2, 1fr); }<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>.viral-stats { grid-template-columns: 1fr; }<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">    </span>&lt;/style&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b>&lt;/head&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b>&lt;body&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;div class="deployment-info"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;strong&gt;🚀 Serverless Mode:&lt;/strong&gt; Using backend functions for real API data via Netlify Functions</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b><span class="Apple-converted-space">        </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;div class="header"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;h1 class="title"&gt;Global Ransomware Intelligence Center&lt;/h1&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;p class="subtitle"&gt;Real-time threat monitoring with serverless backend&lt;/p&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="status-section"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="threat-status"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;div class="threat-level" id="threatLevel"&gt;THREAT LEVEL: HIGH&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;div class="update-info"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;span&gt;Last Updated:&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;span class="last-update-time" id="lastUpdate"&gt;Loading...&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;button class="refresh-btn" onclick="refreshData()"&gt;Refresh&lt;/button&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;button class="share-btn" onclick="shareData()"&gt;Share&lt;/button&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b><span class="Apple-converted-space">        </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;div class="viral-stats"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="viral-card"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="viral-number" id="ransomPayments"&gt;Loading...&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="viral-label"&gt;Total BTC Ransom Payments Tracked&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="viral-card"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="viral-number" id="cisaAlerts"&gt;Loading...&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="viral-label"&gt;CISA Security Alerts (Last 30 Days)&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b><span class="Apple-converted-space">        </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;div class="stats-overview" id="statsOverview"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="stat-card real-data"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-number" id="ransomwarePayments"&gt;---&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-label"&gt;Bitcoin Payments &lt;span class="data-source-badge"&gt;LIVE&lt;/span&gt;&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="stat-card real-data"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-number" id="recentAlerts"&gt;---&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-label"&gt;Gov Alerts &lt;span class="data-source-badge"&gt;LIVE&lt;/span&gt;&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="stat-card real-data"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-number" id="canadianAlerts"&gt;---&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-label"&gt;CA Alerts &lt;span class="data-source-badge"&gt;LIVE&lt;/span&gt;&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="stat-card"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-number" id="activeThreats"&gt;---&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-label"&gt;Active Threats&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="stat-card"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-number" id="globalAttacks"&gt;---&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-label"&gt;Global Attacks&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="stat-card"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-number" id="financialImpact"&gt;---&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="stat-label"&gt;Financial Impact&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b><span class="Apple-converted-space">        </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;div class="dashboard-grid"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="section"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="section-header"&gt;Bitcoin Ransomware Payments (Live Data) &lt;span class="api-status" id="ransomwhereStatus"&gt;●&lt;/span&gt;&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="section-content" id="ransomwhereData"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;div style="text-align: center; color: #6b7280; padding: 20px;"&gt;Loading Ransomwhere data...&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="section"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="section-header"&gt;CISA Security Advisories (Live Feed) &lt;span class="api-status" id="cisaStatus"&gt;●&lt;/span&gt;&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="section-content" id="cisaData"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;div style="text-align: center; color: #6b7280; padding: 20px;"&gt;Loading CISA advisories...&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="section"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="section-header"&gt;Canadian Cyber Security Alerts &lt;span class="api-status" id="canadaStatus"&gt;●&lt;/span&gt;&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="section-content" id="canadaData"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;div style="text-align: center; color: #6b7280; padding: 20px;"&gt;Loading Canadian alerts...&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="section"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="section-header"&gt;API Response Times&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="section-content" id="apiMetrics"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;div style="text-align: center; color: #6b7280; padding: 20px;"&gt;Loading API metrics...&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b><span class="Apple-converted-space">        </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;div class="section"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="section-header"&gt;Live Payment Analysis - Recent Bitcoin Transactions&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;div class="section-content" id="paymentAnalysis"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div style="text-align: center; color: #6b7280; padding: 20px;"&gt;Loading payment analysis...&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">    </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">    </span>&lt;script&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>console.log('🚀 Ransomware Intelligence Dashboard - Serverless Mode');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>// API Status Management</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>function updateAPIStatus(elementId, success, responseTime = null) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>const element = document.getElementById(elementId);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>if (element) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>element.className = success ? 'api-status api-success' : 'api-status api-error';</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>element.textContent = success ?<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>(responseTime ? `● ${responseTime}ms` : '● LIVE') :<span class="Apple-converted-space"> </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>'● ERROR';</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>// Main API call to serverless function</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>async function fetchRansomwareData() {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>const startTime = Date.now();</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b><span class="Apple-converted-space">            </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>try {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>console.log('🔍 Fetching data from serverless API...');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>const response = await fetch('/.netlify/functions/ransomware-api', {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>method: 'GET',</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>headers: {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>'Accept': 'application/json',</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>'Content-Type': 'application/json'</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>});</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>const responseTime = Date.now() - startTime;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>console.log(`⚡ API Response time: ${responseTime}ms`);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>if (!response.ok) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>throw new Error(`HTTP ${response.status}: ${response.statusText}`);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>const data = await response.json();</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>console.log('✅ Serverless API data received:', data);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>// Update API metrics</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>updateAPIMetrics(data, responseTime);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>// Update dashboard with real data</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>updateDashboardWithServerlessData(data);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>return data;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>} catch (error) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>console.error('❌ Serverless API Error:', error);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>// Fall back to simulated data</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>const simulatedData = generateFallbackData();</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>updateDashboardWithServerlessData(simulatedData);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>return simulatedData;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>function updateAPIMetrics(data, responseTime) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>const metricsHtml = `</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="list-item real-data"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;span class="item-name"&gt;Total Response Time&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;span class="item-value"&gt;${responseTime}ms&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="list-item ${data.sources.ransomwhere.status === 'success' ? 'real-data' : ''}"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;span class="item-name"&gt;Ransomwhere API&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;span class="item-value"&gt;${data.sources.ransomwhere.status}&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="list-item ${data.sources.cisa.status === 'success' ? 'real-data' : ''}"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;span class="item-name"&gt;CISA API&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;span class="item-value"&gt;${data.sources.cisa.status}&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="list-item ${data.sources.canadian.status === 'success' ? 'real-data' : ''}"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;span class="item-name"&gt;Canadian API&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;span class="item-value"&gt;${data.sources.canadian.status}&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;div class="list-item real-data"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;span class="item-name"&gt;Last Fetch&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;span class="item-value"&gt;${new Date(data.timestamp).toLocaleTimeString()}&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>`;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>document.getElementById('apiMetrics').innerHTML = metricsHtml;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>function updateDashboardWithServerlessData(data) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>const { ransomwhere, cisa, canadian } = data.sources;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>// Update status indicators</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>updateAPIStatus('ransomwhereStatus', ransomwhere.status === 'success');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>updateAPIStatus('cisaStatus', cisa.status === 'success');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>updateAPIStatus('canadaStatus', canadian.status === 'success');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>// Update viral stats</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>if (ransomwhere.status === 'success' &amp;&amp; ransomwhere.data) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>const totalPayments = ransomwhere.data.reduce((sum, payment) =&gt; sum + payment.amount, 0);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('ransomPayments').textContent = totalPayments.toFixed(2) + ' BTC';</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('ransomwarePayments').textContent = ransomwhere.data.length;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>} else {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('ransomPayments').textContent = 'API Error';</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('ransomwarePayments').textContent = '---';</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>if (cisa.status === 'success' &amp;&amp; cisa.data) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>const ransomwareAlerts = cisa.data.filter(alert =&gt; alert.isRansomware).length;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('cisaAlerts').textContent = ransomwareAlerts;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('recentAlerts').textContent = cisa.data.length;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>} else {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('cisaAlerts').textContent = 'API Error';</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('recentAlerts').textContent = '---';</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>if (canadian.status === 'success' &amp;&amp; canadian.data) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>const recentAlerts = canadian.data.filter(alert =&gt; alert.isRecent).length;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('canadianAlerts').textContent = recentAlerts;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>} else {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('canadianAlerts').textContent = '---';</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>// Update sections with real data</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>updateRansomwhereSection(ransomwhere);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>updateCISASection(cisa);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>updateCanadianSection(canadian);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>updatePaymentAnalysis(ransomwhere);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>// Generate remaining simulated data</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>generateSimulatedSupportingData();</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>function updateRansomwhereSection(ransomwhere) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>if (ransomwhere.status === 'success' &amp;&amp; ransomwhere.data) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>const familyStats = {};</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>ransomwhere.data.forEach(payment =&gt; {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>familyStats[payment.family] = (familyStats[payment.family] || 0) + payment.amount;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>});</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>const sortedFamilies = Object.entries(familyStats)</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>.sort(([,a], [,b]) =&gt; b - a)</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>.slice(0, 8);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('ransomwhereData').innerHTML = sortedFamilies</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>.map(([family, amount]) =&gt; `</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;div class="list-item real-data"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                            </span>&lt;span class="item-name"&gt;${family}&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                            </span>&lt;span class="item-value"&gt;${amount.toFixed(4)} BTC&lt;/span&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>`).join('');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>} else {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('ransomwhereData').innerHTML = `</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;div style="color: #dc2626; text-align: center; padding: 20px;"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>API Error: ${ransomwhere.error || 'Unknown error'}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>`;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>function updateCISASection(cisa) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>if (cisa.status === 'success' &amp;&amp; cisa.data) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('cisaData').innerHTML = cisa.data</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>.slice(0, 6)</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>.map(alert =&gt; `</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;div class="list-item real-data"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                            </span>&lt;div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;div class="item-name"&gt;${alert.title.substring(0, 50)}...&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;div style="font-size: 9px; color: #6b7280; margin-top: 2px;"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                    </span>${new Date(alert.date).toLocaleDateString()}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>`).join('');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>} else {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('cisaData').innerHTML = `</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;div style="color: #dc2626; text-align: center; padding: 20px;"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>API Error: ${cisa.error || 'Unknown error'}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>`;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>function updateCanadianSection(canadian) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>if (canadian.status === 'success' &amp;&amp; canadian.data) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('canadaData').innerHTML = canadian.data</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>.slice(0, 6)</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>.map(alert =&gt; `</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;div class="list-item real-data"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                            </span>&lt;div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;div class="item-name"&gt;${alert.title.substring(0, 50)}...&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;div style="font-size: 9px; color: #6b7280; margin-top: 2px;"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                    </span>${new Date(alert.date).toLocaleDateString()}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>`).join('');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>} else {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('canadaData').innerHTML = `</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;div style="color: #dc2626; text-align: center; padding: 20px;"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>API Error: ${canadian.error || 'Unknown error'}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>`;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>function updatePaymentAnalysis(ransomwhere) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>if (ransomwhere.status === 'success' &amp;&amp; ransomwhere.data) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>const recentPayments = ransomwhere.data</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>.sort((a, b) =&gt; new Date(b.date) - new Date(a.date))</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>.slice(0, 5);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('paymentAnalysis').innerHTML = recentPayments</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>.map(payment =&gt; `</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;div style="background: #1f2937; border: 1px solid #374151; border-radius: 4px; padding: 10px; margin-bottom: 8px; border-left: 3px solid #10b981;"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                            </span>&lt;div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;div style="font-weight: 500; color: #ffffff; font-size: 12px;"&gt;${payment.family}&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;div style="font-size: 9px; color: #6b7280;"&gt;${payment.date}&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                            </span>&lt;div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 10px;"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                    </span>&lt;div style="color: #9ca3af; margin-bottom: 1px;"&gt;Amount&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                    </span>&lt;div style="color: #ffffff; font-weight: 500;"&gt;${payment.amount.toFixed(6)} BTC&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                    </span>&lt;div style="color: #9ca3af; margin-bottom: 1px;"&gt;Address&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                    </span>&lt;div style="color: #ffffff; font-weight: 500; font-family: monospace; font-size: 9px;"&gt;${payment.address.substring(0, 16)}...&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                                </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                            </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>`).join('');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>} else {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>document.getElementById('paymentAnalysis').innerHTML = `</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;div style="color: #dc2626; text-align: center; padding: 20px;"&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                        </span>Payment data unavailable: ${ransomwhere.error || 'API error'}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>&lt;/div&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>`;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>function generateSimulatedSupportingData() {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>// Add the remaining simulated sections here</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>const activeThreats = Math.floor(Math.random() * 50 + 147);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>const globalAttacks = Math.floor(Math.random() * 100 + 523);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>const financialImpact = (Math.random() * 10 + 28).toFixed(1) + 'M';</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>document.getElementById('activeThreats').textContent = activeThreats;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>document.getElementById('globalAttacks').textContent = globalAttacks;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>document.getElementById('financialImpact').textContent = financialImpact;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>function generateFallbackData() {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>return {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>timestamp: new Date().toISOString(),</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>sources: {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>ransomwhere: { status: 'error', data: null, error: 'Connection failed' },</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>cisa: { status: 'error', data: null, error: 'Connection failed' },</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>canadian: { status: 'error', data: null, error: 'Connection failed' }</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>};</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>async function refreshData() {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>console.log('🔄 Refreshing serverless data...');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>document.getElementById('lastUpdate').textContent = new Date().toLocaleString();</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>await fetchRansomwareData();</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>function shareData() {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>console.log('📤 Share button clicked!');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>if (navigator.share) {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>navigator.share({</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>title: 'Global Ransomware Intelligence Center',</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>text: 'Live ransomware threat monitoring dashboard with serverless backend',</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>url: window.location.href</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>});</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>} else {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>navigator.clipboard.writeText(window.location.href).then(() =&gt; {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                    </span>alert('Dashboard URL copied to clipboard!');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">                </span>});</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>}</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b></b></span><br></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>// Initialize</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>document.addEventListener('DOMContentLoaded', function() {</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>console.log('🚀 Serverless dashboard initialized');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>refreshData();</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b><span class="Apple-converted-space">            </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>// Auto-refresh every 5 minutes</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">            </span>setInterval(refreshData, 300000);</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>});</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 28.0px"><span class="s1"><b><span class="Apple-converted-space">        </span></b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">        </span>console.log('✅ Serverless dashboard loaded successfully');</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b><span class="Apple-converted-space">    </span>&lt;/script&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b>&lt;/body&gt;</b></span></h1>
+<h1 style="margin: 0.0px 0.0px 6.0px 0.0px; font: 24.0px '.SF NS'; color: #ffffff; -webkit-text-stroke: #ffffff"><span class="s1"><b>&lt;/html&gt;</b></span></h1>
 </body>
 </html>
